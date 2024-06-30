@@ -7,7 +7,13 @@
 
 <h1>Data</h1>
 
-<button class="btn btn-primary" @onclick=Load>Load</button>
+<ul>
+    <li><a href="Алматы_2021.xlsx" download="Алматы_2021.xlsx">Алматы_2021.xlsx - исходный файл</a></li>
+    <li><a href="locations.csv" download="locations_2021.csv">locations.csv - описание кодов датчиков</a></li>
+    <li><a href="report.csv" download="report_2021.csv">report.csv - собранные данные в 1 CSV файл для удобства анализа</a></li>
+</ul>
+
+@* <button class="btn btn-primary" @onclick=Load>Load</button> *@
 
 @if (Reports is not null)
 {

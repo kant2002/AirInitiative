@@ -216,6 +216,7 @@ public static class ReportLoader
             Code = stationCode,
             LocationName = locationName ?? throw new InvalidOperationException("Location name is missing"),
             IsManualCollection = isManualCollection,
+            Measurements = items.ToArray(),
         };
     }
 
