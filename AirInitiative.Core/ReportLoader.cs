@@ -1,10 +1,13 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System.Globalization;
 
 namespace AirInitiative.Core;
 
 public static class ReportLoader
 {
+    public static Action<MeasurementReport>? ReportProduced;
+    public static Action<ErrorRow>? ErrorRowDetected;
     public static async Task<MeasurementReport[]> Load(Stream stream)
     {
         using var document = SpreadsheetDocument.Open(stream, false);
@@ -16,7 +19,7 @@ public static class ReportLoader
         foreach (var sheet in sheets)
         {
             var report = LoadMeasurementReport(workbookPart, sheet);
-            Console.WriteLine($"Station {report.Code} at {report.LocationName} with {(report.IsManualCollection ? " manual" : "automatic")} collection");
+            ReportProduced?.Invoke(report);
             reports.Add(report);
         }
 
@@ -55,12 +58,13 @@ public static class ReportLoader
                     {
                         if (c.CellReference == "A3") goto next_row;
                         if (c.CellReference == "A4") goto next_row;
-                        if (c.CellReference.Value![0] == 'A')
+                        var column = c.CellReference.Value![0];
+                        if (column == 'A')
                         {
                             var date = GetValue();
                             MeasureDateLocal = DateTime.FromOADate(int.Parse(date));
                         }
-                        if (c.CellReference.Value![0] == 'B')
+                        if (column == 'B')
                         {
                             var hour = GetValue();
                             if (MeasureDateLocal.HasValue)
@@ -68,7 +72,7 @@ public static class ReportLoader
                                 MeasureDateLocal = MeasureDateLocal.Value.AddHours(int.Parse(hour));
                             }
                         }
-                        if (c.CellReference.Value![0] == 'C')
+                        if (column == 'C')
                         {
                             var v = GetValue();
                             if (v != null)
@@ -76,7 +80,7 @@ public static class ReportLoader
                                 SO2 = double.Parse(v);
                             }
                         }
-                        if (c.CellReference.Value![0] == 'D')
+                        if (column == 'D')
                         {
                             var v = GetValue();
                             if (v != null)
@@ -84,11 +88,88 @@ public static class ReportLoader
                                 NO2 = double.Parse(v);
                             }
                         }
-                        if (c.CellReference.Value![0] == 'E')
+                        if (column == 'E')
                         {
                             var v = GetValue();
                             if (v != null)
                             {
+                                CO = double.Parse(v);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (c.CellReference == "A3") goto next_row;
+                        if (c.CellReference == "A4") goto next_row;
+                        var column = c.CellReference.Value![0];
+                        if (column == 'A')
+                        {
+                            var date = GetValue();
+                            MeasureDateLocal = DateTime.ParseExact(date, "dd.MM.yyyy HH:mm", CultureInfo.GetCultureInfo("ru-RU"));
+                            //MeasureDateLocal = DateTime.FromOADate(double.Parse(date));
+                        }
+                        if (column == 'B')
+                        {
+                            var v = GetValue();
+                            if (v != null)
+                            {
+                                if (v == "")
+                                {
+                                    ErrorRowDetected?.Invoke(new(sheet.Name!, c.CellReference.Value!, "PM25", MeasureDateLocal));
+                                    continue;
+                                }
+                                PM25 = double.Parse(v);
+                            }
+                        }
+                        if (column == 'C')
+                        {
+                            var v = GetValue();
+                            if (v != null)
+                            {
+                                if (v == "")
+                                {
+                                    ErrorRowDetected?.Invoke(new(sheet.Name!, c.CellReference.Value!, "PM100", MeasureDateLocal));
+                                    continue;
+                                }
+                                PM100 = double.Parse(v);
+                            }
+                        }
+                        if (column == 'D')
+                        {
+                            var v = GetValue();
+                            if (v != null)
+                            {
+                                if (v == "")
+                                {
+                                    ErrorRowDetected?.Invoke(new(sheet.Name!, c.CellReference.Value!, "SO2", MeasureDateLocal));
+                                    continue;
+                                }
+                                SO2 = double.Parse(v);
+                            }
+                        }
+                        if (column == 'E')
+                        {
+                            var v = GetValue();
+                            if (v != null)
+                            {
+                                if (v == "")
+                                {
+                                    ErrorRowDetected?.Invoke(new(sheet.Name!, c.CellReference.Value!, "NO2", MeasureDateLocal));
+                                    continue;
+                                }
+                                NO2 = double.Parse(v);
+                            }
+                        }
+                        if (column == 'F')
+                        {
+                            var v = GetValue();
+                            if (v != null)
+                            {
+                                if (v == "")
+                                {
+                                    ErrorRowDetected?.Invoke(new(sheet.Name!, c.CellReference.Value!, "CO", MeasureDateLocal));
+                                    continue;
+                                }
                                 CO = double.Parse(v);
                             }
                         }
@@ -120,8 +201,11 @@ public static class ReportLoader
                     }
                 }
             }
-            //MeasurementItem item = new();
-            //items.Add(item);
+
+            if (!MeasureDateLocal.HasValue) continue;
+
+            MeasurementItem item = new(MeasureDateLocal.Value, SO2, NO2, CO, PM25, PM100);
+            items.Add(item);
         next_row:
             ;
         }
@@ -134,4 +218,6 @@ public static class ReportLoader
             IsManualCollection = isManualCollection,
         };
     }
+
+    public record ErrorRow(string SheetName, string CellReference, string MeasurementName, DateTime? MeasureDateTime);
 }
