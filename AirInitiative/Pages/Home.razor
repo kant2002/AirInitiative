@@ -11,6 +11,9 @@
 
 @if (Reports is not null)
 {
+    <p>
+        Start date: @StartDate - Finish date: @FinishDate
+    </p>
     <table class="table table-condensed table-sm">
         <thead>
             <tr>
@@ -37,9 +40,13 @@
 
 @code {
     private MeasurementReport[]? Reports;
+    DateTime StartDate;
+    DateTime FinishDate;
     async Task Load()
     {
         var filePath = await HttpClient.GetStreamAsync(@"/Алматы_2021.xlsx");
+        StartDate = DateTime.UtcNow;
         Reports = await ReportLoader.Load(filePath);
+        FinishDate = DateTime.UtcNow;
     }
 }
