@@ -8,4 +8,5 @@ public class MeasurementReport
     public double? Longitude { get; set; }
     public double? Latitude { get; set; }
     public string[] MeasurementTaken { get; set; }
+    public MeasurementItem[] Measurements { get; set; }
 }

@@ -27,53 +27,106 @@ public static class ReportLoader
     {
         var worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
         var sharedStringTable = workbookPart.SharedStringTablePart.SharedStringTable;
-        string? stationCode = null;
-        string? locationName = null;
-        var rows = worksheetPart.Worksheet.Descendants<Row>();
-        foreach (var row in rows)
-        {
-            int count = row.Elements<Cell>().Count();
-            if (stationCode is not null && locationName is not null) break;
-
-            foreach (Cell c in row.Elements<Cell>())
-            {
-                if (c.CellReference == "B2")
-                {
-                    var cellValue = c.InnerText;
-                    if (c.DataType is not null && c.DataType == CellValues.SharedString)
-                    {
-                        stationCode = sharedStringTable.ElementAt(int.Parse(cellValue)).InnerText;
-                    }
-                    else
-                    {
-                        stationCode = c.CellValue!.InnerText;
-                    }
-                    if (stationCode is not null && locationName is not null) break;
-                }
-                if (c.CellReference == "C2")
-                {
-                    var cellValue = c.InnerText;
-                    if (c.DataType is not null && c.DataType == CellValues.SharedString)
-                    {
-                        locationName = sharedStringTable.ElementAt(int.Parse(cellValue)).InnerText;
-                    }
-                    else
-                    {
-                        locationName = c.CellValue!.InnerText;
-                    }
-                    if (stationCode is not null && locationName is not null) break;
-
-                }
-            }
-        }
-
         bool isManualCollection = true;
-        stationCode = stationCode ?? throw new InvalidOperationException("Station code is missing");
         if (sheet.Name?.HasValue == true)
         {
             isManualCollection = sheet.Name.Value!.Contains("-руч");
         }
 
+        string? stationCode = null;
+        string? locationName = null;
+        var rows = worksheetPart.Worksheet.Descendants<Row>();
+        List<MeasurementItem> items = new();
+        foreach (var row in rows)
+        {
+            int count = row.Elements<Cell>().Count();
+            //if (stationCode is not null && locationName is not null) break;
+            DateTime? MeasureDateLocal = null;
+            double? SO2 = null;
+            double? NO2 = null;
+            double? CO = null;
+            double? PM25 = null;
+            double? PM100 = null;
+            foreach (Cell c in row.Elements<Cell>())
+            {
+                if (stationCode is not null && locationName is not null)
+                {
+                    if (isManualCollection)
+                    {
+                        if (c.CellReference == "A3") goto next_row;
+                        if (c.CellReference == "A4") goto next_row;
+                        if (c.CellReference.Value![0] == 'A')
+                        {
+                            var date = GetValue();
+                            MeasureDateLocal = DateTime.FromOADate(int.Parse(date));
+                        }
+                        if (c.CellReference.Value![0] == 'B')
+                        {
+                            var hour = GetValue();
+                            if (MeasureDateLocal.HasValue)
+                            {
+                                MeasureDateLocal = MeasureDateLocal.Value.AddHours(int.Parse(hour));
+                            }
+                        }
+                        if (c.CellReference.Value![0] == 'C')
+                        {
+                            var v = GetValue();
+                            if (v != null)
+                            {
+                                SO2 = double.Parse(v);
+                            }
+                        }
+                        if (c.CellReference.Value![0] == 'D')
+                        {
+                            var v = GetValue();
+                            if (v != null)
+                            {
+                                NO2 = double.Parse(v);
+                            }
+                        }
+                        if (c.CellReference.Value![0] == 'E')
+                        {
+                            var v = GetValue();
+                            if (v != null)
+                            {
+                                CO = double.Parse(v);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (c.CellReference == "B2")
+                    {
+                        stationCode = GetValue();
+                    }
+                    if (c.CellReference == "C2")
+                    {
+                        locationName = GetValue();
+                    }
+                    if (stationCode is not null && locationName is not null) break;
+                }
+
+                string? GetValue()
+                {
+                    var cellValue = c.InnerText;
+                    if (c.DataType is not null && c.DataType == CellValues.SharedString)
+                    {
+                        return sharedStringTable.ElementAt(int.Parse(cellValue)).InnerText;
+                    }
+                    else
+                    {
+                        return c.CellValue?.InnerText;
+                    }
+                }
+            }
+            //MeasurementItem item = new();
+            //items.Add(item);
+        next_row:
+            ;
+        }
+
+        stationCode = stationCode ?? throw new InvalidOperationException("Station code is missing");
         return new MeasurementReport()
         {
             Code = stationCode,
