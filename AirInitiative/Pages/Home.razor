@@ -1,7 +1,45 @@
 ﻿@page "/"
+@inject HttpClient HttpClient
+@using DocumentFormat.OpenXml.Packaging
+@using DocumentFormat.OpenXml.Spreadsheet
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Data</h1>
 
-Welcome to your new app.
+<button class="btn btn-primary" @onclick=Load>Load</button>
+
+@if (Reports is not null)
+{
+    <table class="table table-condensed table-sm">
+        <thead>
+            <tr>
+                <td>Station code</td>
+                <td>Location name</td>
+                <td>Location</td>
+                <td>Automatic?</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var report in Reports)
+            {
+                <tr>
+                    <td>@report.Code</td>
+                    <td>@report.LocationName</td>
+                    <td></td>
+                    <td>@(report.IsManualCollection ? "No" : "Yes")</td>
+                </tr>
+                
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private MeasurementReport[]? Reports;
+    async Task Load()
+    {
+        var filePath = await HttpClient.GetStreamAsync(@"/Алматы_2021.xlsx");
+        Reports = await ReportLoader.Load(filePath);
+    }
+}

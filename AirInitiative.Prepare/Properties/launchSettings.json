@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AirInitiative.Prepare": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\d\\kant\\GitHub\\AirInitiative\\AirInitiative\\wwwroot\\Алматы_2021.xlsx"
+    }
+  }
+}

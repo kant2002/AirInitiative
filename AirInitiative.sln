@@ -5,6 +5,10 @@ VisualStudioVersion = 17.11.35017.193
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirInitiative", "AirInitiative\AirInitiative.csproj", "{2A79FAE6-A917-4720-9F9B-1E8DDE6EFF17}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirInitiative.Core", "AirInitiative.Core\AirInitiative.Core.csproj", "{29212F36-907B-498A-A14C-655E87D78F05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirInitiative.Prepare", "AirInitiative.Prepare\AirInitiative.Prepare.csproj", "{1CA672E4-DA5F-4154-9CFA-6A8CC588957A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{2A79FAE6-A917-4720-9F9B-1E8DDE6EFF17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A79FAE6-A917-4720-9F9B-1E8DDE6EFF17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A79FAE6-A917-4720-9F9B-1E8DDE6EFF17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29212F36-907B-498A-A14C-655E87D78F05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29212F36-907B-498A-A14C-655E87D78F05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29212F36-907B-498A-A14C-655E87D78F05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29212F36-907B-498A-A14C-655E87D78F05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CA672E4-DA5F-4154-9CFA-6A8CC588957A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CA672E4-DA5F-4154-9CFA-6A8CC588957A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CA672E4-DA5F-4154-9CFA-6A8CC588957A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CA672E4-DA5F-4154-9CFA-6A8CC588957A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
