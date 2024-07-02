@@ -1,19 +1,25 @@
 ﻿using AirInitiative.Core;
 using System.Globalization;
 
-ReportLoader.ReportProduced += (report) =>
-{
-    Console.WriteLine($"Station {report.Code} at {report.LocationName} with {(report.IsManualCollection ? " manual" : "automatic")} collection");
-};
-ReportLoader.ErrorRowDetected += (row) =>
-{
-    Console.WriteLine($"Empty value in cell {row.CellReference}({row.MeasurementName}) at sheet {row.SheetName} at date {row.MeasureDateTime}");
-};
-var reports = await ReportLoader.Load(File.OpenRead(args[0]));
-WriteLocationsFile();
-WriteExportFile();
+await ExportFromOldFormat(args[0]);
 
-void WriteExportFile()
+async Task ExportFromOldFormat(string fileName)
+{
+
+    ReportLoader.ReportProduced += (report) =>
+    {
+        Console.WriteLine($"Station {report.Code} at {report.LocationName} with {(report.IsManualCollection ? " manual" : "automatic")} collection");
+    };
+    ReportLoader.ErrorRowDetected += (row) =>
+    {
+        Console.WriteLine($"Empty value in cell {row.CellReference}({row.MeasurementName}) at sheet {row.SheetName} at date {row.MeasureDateTime}");
+    };
+    var reports = await ReportLoader.Load(File.OpenRead(fileName));
+    WriteLocationsFile(reports);
+    WriteExportFile(reports);
+}
+
+void WriteExportFile(MeasurementReport[] reports)
 {
     using CsvHelper.CsvWriter writer = new CsvHelper.CsvWriter(new StreamWriter("report.csv", false, System.Text.Encoding.UTF8), CultureInfo.InvariantCulture);
     writer.WriteRecords(reports.SelectMany(x => x.Measurements.Select(item => new
@@ -28,7 +34,7 @@ void WriteExportFile()
         item.PM100,
     })));
 }
-void WriteLocationsFile()
+void WriteLocationsFile(MeasurementReport[] reports)
 {
     using CsvHelper.CsvWriter writer = new CsvHelper.CsvWriter(new StreamWriter("locations.csv", false, System.Text.Encoding.UTF8), CultureInfo.InvariantCulture);
     writer.WriteRecords(reports.Select(x => new
