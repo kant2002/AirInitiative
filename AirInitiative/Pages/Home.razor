@@ -13,6 +13,18 @@
     <li><a href="report.csv" download="report_2021.csv">report.csv - собранные данные в 1 CSV файл для удобства анализа</a></li>
 </ul>
 
+<h2>Структура данных</h2>
+<p>    
+    Ключ - Provider + Code + IsManualCollection
+</p>
+<ul>
+    <li>Provider - Провайдер данных. Есть два провайдера - XLSX файл со старыми данными и через API https://api.openaq.org/docs#/</li>
+    <li>Code - код точки сбора</li>
+    <li>IsManualCollection - Если true ручной збор данных, false - автоматический </li>
+    <li>LocationName - Название места как указано в источнике данных </li>
+    <li>Longitude - Долгота <i>необязательно</i></li>
+    <li>Latitude - Широта <i>необязательно</i></li>
+</ul>
 @* <button class="btn btn-primary" @onclick=Load>Load</button> *@
 
 @if (Reports is not null)
