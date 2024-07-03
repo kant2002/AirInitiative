@@ -3,11 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35017.193
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirInitiative", "AirInitiative\AirInitiative.csproj", "{2A79FAE6-A917-4720-9F9B-1E8DDE6EFF17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirInitiative", "AirInitiative\AirInitiative.csproj", "{2A79FAE6-A917-4720-9F9B-1E8DDE6EFF17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirInitiative.Core", "AirInitiative.Core\AirInitiative.Core.csproj", "{29212F36-907B-498A-A14C-655E87D78F05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirInitiative.Core", "AirInitiative.Core\AirInitiative.Core.csproj", "{29212F36-907B-498A-A14C-655E87D78F05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirInitiative.Prepare", "AirInitiative.Prepare\AirInitiative.Prepare.csproj", "{1CA672E4-DA5F-4154-9CFA-6A8CC588957A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirInitiative.Prepare", "AirInitiative.Prepare\AirInitiative.Prepare.csproj", "{1CA672E4-DA5F-4154-9CFA-6A8CC588957A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{52C04EBC-18B9-45A9-BF85-88EE1C43F634}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
