@@ -4,10 +4,39 @@ using System.Net.Http.Json;
 
 var client = new HttpClient();
 var root = await client.GetFromJsonAsync<Root>("https://api.openaq.org/v3/locations?order_by=id&sort_order=asc&countries_id=15&providers_id=119&providers_id=166&coordinates=43.238949%2C76.889709&radius=25000&limit=100&page=1");
-var locations = root.results.Select(r => new LocationInformation("openaq.org", r.id.ToString(), false, r.name, r.coordinates.longitude, r.coordinates.latitude));
-var reports = await ReportLoader.Load(File.OpenRead(args[0]));
+var storageLocation = "data";
+Directory.CreateDirectory(storageLocation);
+foreach (var r in root.results)
+{
+    Console.WriteLine($"{r.id},{r.name}. From: {r.datetimeFirst.utc.Date:u} To: {r.datetimeLast.utc.Date:u}");
+    for (DateTime d = r.datetimeFirst.utc.Date; d <= r.datetimeLast.utc.Date; d = d.AddDays(1))
+    {
+        var targetFile = $"{storageLocation}/location-{r.id}-{d:yyyyMMdd}.csv.gz";
+        if (File.Exists(targetFile))
+        {
+            continue;
+        }
+        else
+        {
+            var url = $"https://openaq-data-archive.s3.amazonaws.com/records/csv.gz/locationid={r.id}/year={d:yyyy}/month={d:MM}/location-{r.id}-{d:yyyyMMdd}.csv.gz";
+            var streamResponse = await client.GetAsync(url);
+            if (!streamResponse.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Cannot download {url}");
+                File.AppendAllLines("broken-urls.txt", [url]);
+                continue;
+            }
 
-WriteLocationsFile("locations.csv", locations.Union(GetLocations(reports)));
+            var stream = streamResponse.Content.ReadAsStream();
+            using var file = File.OpenWrite($"{storageLocation}/location-{r.id}-{d:yyyyMMdd}.csv.gz");
+            await stream.CopyToAsync(file);
+        }
+    }
+}
+//var locations = root.results.Select(r => new LocationInformation("openaq.org", r.id.ToString(), false, r.name, r.coordinates.longitude, r.coordinates.latitude));
+//var reports = await ReportLoader.Load(File.OpenRead(args[0]));
+
+//WriteLocationsFile("locations.csv", locations.Union(GetLocations(reports)));
 // await ExportFromOldFormat(args[0]);
 
 async Task ExportFromOldFormat(string fileName)
