@@ -21,4 +21,13 @@
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
   </ItemGroup>
 
+  <Target AfterTargets="Restore" Name="ВідновитиПакети" BeforeTargets="Build">
+    <Exec Command="npm install" />
+  </Target>
+
+  <Target AfterTargets="Build" Name="ПобудуватиМодіфікованийБутстрап" 
+          Inputs="scss/site.scss" Outputs="wwwroot/css/site.css">
+    <Exec Command="npm run css" />
+  </Target>
+
 </Project>

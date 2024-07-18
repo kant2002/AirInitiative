@@ -1,0 +1,9 @@
+﻿// Bootstrap variables override
+$body-bg: white !default;
+$body-color: #383e49 !default;
+$primary: #1f5bff !default;
+$secondary: #FFD700 !default;
+$success: #2ade56 !default;
+$danger: #e01d2a !default;
+
+@import "../node_modules/bootstrap/scss/bootstrap";
